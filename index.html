@@ -3,64 +3,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Novexa Search</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       background: #0b1020;
       color: white;
       font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      padding: 55px 18px;
     }
-    main { width: 90%; max-width: 600px; }
-    h1 { font-size: 52px; margin-bottom: 8px; }
+    main { max-width: 720px; margin: auto; }
+    header { text-align: center; margin-bottom: 35px; }
+    h1 { font-size: 48px; margin-bottom: 8px; }
     h1 span { color: #61a5ff; }
-    p { color: #aab5cc; }
+    header p, .muted { color: #aab5cc; }
+    form { display: flex; gap: 8px; }
     input {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 17px;
-      border-radius: 30px;
+      flex: 1;
+      min-width: 0;
+      padding: 16px;
+      border-radius: 28px;
       border: 1px solid #39445d;
       background: #171f33;
       color: white;
       font-size: 16px;
-      outline: none;
     }
     button {
-      margin-top: 16px;
-      padding: 13px 28px;
+      padding: 14px 20px;
       border: 0;
       border-radius: 25px;
       background: #3985f6;
       color: white;
       font-size: 16px;
     }
+    #results { margin-top: 30px; }
+    .result {
+      padding: 18px 0;
+      border-bottom: 1px solid #29334a;
+    }
+    .result a { color: #75b3ff; font-size: 19px; }
+    .url { color: #8ccea0; font-size: 13px; margin: 8px 0; }
+    .description { color: #c2cce0; line-height: 1.5; }
+    @media(max-width: 420px) {
+      form { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
-  <main>
+<main>
+  <header>
     <h1>NOVEXA<span>.</span></h1>
     <p>Technology without limits.</p>
-    <form id="search">
-      <input id="query" placeholder="Search the web..." required>
-      <button type="submit">Search</button>
-    </form>
-    <p>Innovate. Connect. Empower.</p>
-  </main>
-  <script>
-    document.getElementById("search").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const query = document.getElementById("query").value.trim();
-      if (query) {
-        alert("Novexa search is coming soon! Your search: " + query);
-      }
-    });
-  </script>
+  </header>
+
+  <form id="searchForm">
+    <input id="query" placeholder="Search the web..." required>
+    <button type="submit">Search</button>
+  </form>
+
+  <p class="muted">Innovate. Connect. Empower.</p>
+  <section id="results" aria-live="polite"></section>
+</main>
+
+<script>
+const index = [
+  {
+    title: "YouTube",
+    url: "https://www.youtube.com/",
+    description: "Official YouTube website for watching and sharing videos.",
+    keywords: "youtube videos streaming creators"
+  },
+  {
+    title: "About YouTube",
+    url: "https://en.wikipedia.org/wiki/YouTube",
+    description: "Background, history, and information about YouTube.",
+    keywords: "youtube history information about video platform"
+  },
+  {
+    title: "YouTube Help",
+    url: "https://support.google.com/youtube/",
+    description: "Official help and support for YouTube.",
+    keywords: "youtube help support account"
+  },
+  {
+    title: "Facebook",
+    url: "https://www.facebook.com/",
+    description: "Official Facebook website and social network.",
+    keywords: "facebook social network friends"
+  },
+  {
+    title: "About Facebook",
+    url: "https://en.wikipedia.org/wiki/Facebook",
+    description: "Information and history of Facebook.",
+    keywords: "facebook about history social network"
+  },
+  {
+    title: "Instagram",
+    url: "https://www.instagram.com/",
+    description: "Official Instagram website for sharing photos and videos.",
+    keywords: "instagram photos videos social media"
+  },
+  {
+    title: "Wikipedia",
+    url: "https://www.wikipedia.org/",
+    description: "Free online encyclopedia with articles on many subjects.",
+    keywords: "wikipedia encyclopedia information knowledge"
+  },
+  {
+    title: "GitHub",
+    url: "https://github.com/",
+    description: "Platform for hosting and collaborating on software projects.",
+    keywords: "github code programming developers software"
+  },
+  {
+    title: "TikTok",
+    url: "https://www.tiktok.com/",
+    description: "Official TikTok website for short-form videos.",
+    keywords: "tiktok videos creators entertainment"
+  },
+  {
+    title: "Reddit",
+    url: "https://www.reddit.com/",
+    description: "Online communities and discussions about many topics.",
+    keywords: "reddit communities discussions forums"
+  },
+  {
+    title: "Microsoft",
+    url: "https://www.microsoft.com/",
+    description: "Official Microsoft website for software and technology.",
+    keywords: "microsoft windows software technology"
+  },
+  {
+    title: "Google",
+    url: "https://www.google.com/",
+    description: "Official Google company website.",
+    keywords: "google technology company"
+  }
+];
+
+function rankResults(query) {
+  const words = query.toLowerCase().trim().split(/\s+/);
+
+  return index.map(site => {
+    const title = site.title.toLowerCase();
+    const url = site.url.toLowerCase();
+    const description = site.description.toLowerCase();
+    const keywords = site.keywords.toLowerCase();
+    let score = 0;
+
+    for (const word of words) {
+      if (title === word) score += 12;
+      else if (title.includes(word)) score += 8;
+
+      if (url.includes(word)) score += 6;
+      if (keywords.includes(word)) score += 4;
+      if (description.includes(word)) score += 2;
+    }
+
+    return { ...site, score };
+  })
+  .filter(site => site.score > 0)
+  .sort((a, b) => b.score - a.score);
+}
+
+document.getElementById("searchForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const query = document.getElementById("query").value.trim();
+  const results = rankResults(query);
+  const area = document.getElementById("results");
+
+  area.innerHTML = "";
+
+  const heading = document.createElement("p");
+  heading.className = "muted";
+  heading.textContent = results.length +
+    " results found in the Novexa Index";
+  area.appendChild(heading);
+
+  if (results.length === 0) {
+    area.textContent = "No matching websites in our index yet.";
+    return;
+  }
+
+  results.forEach(site => {
+    const item = document.createElement("article");
+    item.className = "result";
+
+    const link = document.createElement("a");
+    link.href = site.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = site.title;
+
+    const url = document.createElement("div");
+    url.className = "url";
+    url.textContent = site.url;
+
+    const description = document.createElement("p");
+    description.className = "description";
+    description.textContent = site.description;
+
+    item.append(link, url, description);
+    area.appendChild(item);
+  });
+});
+</script>
 </body>
 </html>
