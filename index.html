@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novexa Search</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0b1020;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    main { width: 90%; max-width: 600px; }
+    h1 { font-size: 52px; margin-bottom: 8px; }
+    h1 span { color: #61a5ff; }
+    p { color: #aab5cc; }
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 17px;
+      border-radius: 30px;
+      border: 1px solid #39445d;
+      background: #171f33;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+    button {
+      margin-top: 16px;
+      padding: 13px 28px;
+      border: 0;
+      border-radius: 25px;
+      background: #3985f6;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>NOVEXA<span>.</span></h1>
+    <p>Technology without limits.</p>
+    <form id="search">
+      <input id="query" placeholder="Search the web..." required>
+      <button type="submit">Search</button>
+    </form>
+    <p>Innovate. Connect. Empower.</p>
+  </main>
+  <script>
+    document.getElementById("search").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const query = document.getElementById("query").value.trim();
+      if (query) {
+        alert("Novexa search is coming soon! Your search: " + query);
+      }
+    });
+  </script>
+</body>
+</html>
